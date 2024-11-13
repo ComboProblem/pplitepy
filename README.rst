@@ -42,7 +42,7 @@ Installation
 The project is available at `Python Package Index <https://pypi.org/project/pplitepy/>`_ and
 can be installed with pip::
 
-    $ pip install pplite py
+    $ pip install pplitepy
 
 
 Using from Cython
