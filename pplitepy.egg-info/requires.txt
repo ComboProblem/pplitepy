@@ -1,5 +1,0 @@
-cysignals
-gmpy2>=2.1.0b1
-
-[doc]
-sphinx
