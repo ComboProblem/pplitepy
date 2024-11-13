@@ -1,0 +1,25 @@
+# Ignore c and c++ cython generates
+*.c
+*.cpp
+*.so
+pplite/*.c
+pplite/*.cpp
+pplite/*.so
+# keep the useful c and c++ files
+
+# ignore binaries
+*.so
+# ignore personal text notes
+*.txt
+# don't let notebooks getito the file tree
+*.ipynb
+pplite/.ipynb_checkpoints
+pplite/__pycache__
+.ipynb_checkpoints/
+# ignore build stuff
+build/
+# other stuff that idk why its here
+UNKNOWN.egg-info/
+pplitepy.egg-info/
+
+
