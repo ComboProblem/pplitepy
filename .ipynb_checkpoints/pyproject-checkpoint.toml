@@ -1,0 +1,64 @@
+[build-system]
+requires = [
+    "setuptools>=61.2",
+    "Cython",
+    "cysignals",
+    "gmpy2>=2.1.0b1",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pplitepy"
+description = "Python PPLite wrapper"
+readme = "README.rst"
+authors = [{name = "Acadia Larsen", email = "alarsen@math.ucdavis.edu"}]
+license = {text = "GPL v3"}
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: C++",
+    "Programming Language :: Python",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: Unix",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+keywords = [
+    "polyhedron",
+    "polytope",
+    "convex",
+    "mathematics",
+    "ppl",
+    "pplite",
+    "milp",
+    "linear-programming",
+]
+dependencies = [
+    "cysignals",
+    "gmpy2>=2.1.0b1",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+doc = [
+    "sphinx",
+]
+
+[project.urls]
+Homepage = "https://github.com/ComboProblem/PPLitePy"
+Download = "https://github.com/ComboProblem/PPLitePy"
+
+[tool.setuptools]
+packages = ["pplite"]
+platforms = ["any"]
+include-package-data = false
+
+
+[tool.setuptools.dynamic]
+version = {attr = "pplite.__version__"}
+
+[tool.setuptools.package-data]
+pplite = ["*.pxd", "*.h", "*.hh"]

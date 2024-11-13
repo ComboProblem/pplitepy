@@ -1,0 +1,63 @@
+#long term goal, rewrite test to follow provided test in testing enviroment. 
+
+#Files Mosltly completed
+linear_expr.hh # TODO: Add to linear expression class a way to create an instance without calling variables explicitly
+affine_expr.hh # TODO: Add to affine expression class a way to create an instance without calling variables explicitly
+con.hh # TODO: Finish last few functions with pair output.
+geh.hh # TODO: Finish functions no within class, add set stuff.
+var.hh 
+Itv.hh # TODO: Finish tests
+FLINT_Rational.hh 
+BBOX.hh #TODO: tests, tests are 
+
+## TODO, make sure all files don't have explicit integer conversion within.
+
+#TODO file; dependacies 
+Abs_Poly.hh; bits.hh, con.hh, gen.hh, linear_expr.hh, poly_rel.hh, poly.hh, var.hh, mater_iterator.hh
+Abs_poly_adapter.hh; abs_poly.hh, poly.hh, B_poly.hh, F-poy.hh, u_poly.hh, poly_stats.hh, polySet.hh, bits_in_membory,
+bbox.hh; bits.hh, gen.hh, ITV.hh, rational.hh
+bbox_impl.hh; NONE
+B_Poly.hh; poly.hh, BBox.hh, poly_min.hh, Poly_templ.hh, F_poly.hh
+Bits.hh; utils.hh
+Dyn_ploy.hh; var.hh, linear_expr.hh, bits.hh, con.hh, gen.hh, poly_rel.hh, poly.hh, abs_poly.hh
+F_poly.hh; poly.hh, poly_min.hh, poly_templ.hh
+Index_partion.hh;  
+Poly.hh; ascii_dump_load.hh, mater_iterator.hh, support_utils, bbox, bits, con, gen, integer, ITV, linear_expr, poly_rel, sat, var
+polyset; utils, bits, boox, con, gen, integer, itv, linear_expr, poly_rel, rational, var, poly, B_poly, F_pol
+Poly_rel; 
+Poly_stats; poly.hh, clock.hh
+Sat.hh; bits.hh
+#Not needed
+Bits might not be needed. 
+
+TODO:
+Look at classes sage imports from PPLPY. different models for applications in compilers, we just need NNC polyhedra and constraint systems. community reasons 100% (scope), in practice just need a less. Also look at methods called. Start in parallel, starting to use it. 
+
+#eat your own dogfood in software eng. 
+
+
+
+
+# wrapping box
+# what I understand.
+# Box object is a template class.
+# KVI (keep volume info) is the template info need
+# Attempts, there is lots. Examples, https://docs.cython.org/en/latest/src/userguide/wrapping_CPlusPlus.html
+# 
+#at soem poitn need a ptr. to specialized object, who stores it and how.
+# not type stable. 
+# two seprate classes, one seperate function, visable to user to 
+
+# cdef class Bounding_Box_t(object)
+# code here
+
+# cdef class Bounding_Box_f(object)
+# code here # use PXI file and include it.
+# look in sage, in integer points for pxi file. 
+# cpdef Bounding_Box(KVI)
+# return correct box
+
+
+#this should just define the correct object and initialize it. The use only cares in this sense about the object. Solve by Copy and Paste.
+
+# skipping the bits. it seems irrelevant to expose from user perspective. 
