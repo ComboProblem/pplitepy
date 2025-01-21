@@ -1,7 +1,7 @@
 name: Test
 on:
-  push: { branches: [ "master" ] }
-  pull_request: { branches: [ "master" ] }
+  push: { branches: [ "develop" ] }
+  pull_request: { branches: [ "develop" ] }
 
 concurrency:
   group: test-${{ github.ref }}
