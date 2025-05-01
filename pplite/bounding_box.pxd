@@ -1,3 +1,5 @@
+# distutils: extra_compile_args = -std=c++11
+
 from .pplite_decl cimport *
 
 cdef class Bounding_Box_t:

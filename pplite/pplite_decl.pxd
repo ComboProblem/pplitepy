@@ -1,3 +1,5 @@
+# distutils: extra_compile_args = -std=c++11
+
 from libcpp cimport bool as cppbool
 from libcpp.vector cimport vector as cppvector
 from libcpp.utility cimport pair
