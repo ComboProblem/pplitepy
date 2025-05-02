@@ -1,3 +1,5 @@
+# distutils: extra_compile_args = -std=c++11
+
 from .linear_algebra cimport *
 
 cdef _wrap_Constraint(Con constraint)
