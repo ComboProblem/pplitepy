@@ -30,7 +30,7 @@ The available objects and functions from `pplite` Python module are:
 
 - `Interval` (defined in `pplie.intervals`)
 
-- `Bounding_Box_t`, `Bounding_Box_f` (defined in `pplite.bounding_box
+- `Bounding_Box_t`, `Bounding_Box_f` (defined in `pplite.bounding_box`)
 
 - `PPliteGenerator`, `Point`, `Closure_point`, `Line`, `Ray` (defined in `pplite.generators`)
 	
@@ -40,10 +40,17 @@ Installation
 ------------
 
 The project is available at `Python Package Index <https://pypi.org/project/pplitepy/>`_ and
-can be installed with pip::
+can be installed with pip. It is reccomened to create a virtual enviorment
+(suggested name `venv-pplite`) when installing the package.::
 
-    $ pip install pplitepy
+    $ python3 -m venv venv-pplite
+    $ . ./venv-pplite/bin/activate
+    (venv-pplite) $ pip install pplitepy
+    
+The package should be accessed from the virtual enviroment::
 
+    (venv-pplite) $ python3
+    >>> import pplite
 
 Using from Cython
 -----------------
