@@ -133,19 +133,19 @@ cdef class NNC_Polyhedron(object):
             s = kwrds.pop("spec_elem")
             t = kwrds.pop("topology")
             if isinstance(d, int):
-                dd = d # needs to be a python int? Gotta figure out how to typed integer conversions. Ask about this
+                dd = d # needs to be a python int? Gotta figure out how to typed integer conversions. Ask about this. 
                 ss = string_to_Spec_Elem(s)
                 tt = string_to_Topol(t)
                 self.thisptr = new Poly(dd, ss, tt)
                 return
-            raise ValueError("double check inputs of constructor.")
+            raise ValueError("dim_type is required to be an instance of `:class:int`. spec_elem is either a string `universe` or `empty`, topology is either `nnc` or `closed`.")
         if "nnc_poly" in kwrds.keys():
             nnc_poly = kwrds.pop("nnc_poly")
             if isinstance(nnc_poly, NNC_Polyhedron):
                 yy = (<NNC_Polyhedron> nnc_poly).thisptr
                 self.thisptr = new Poly(yy[0])
                 return
-            raise ValueError(":class:`NNC_Polyhedron` needs to be provided to use the nnc_poly key word constructor.")
+            raise TypeError(":class:`NNC_Polyhedron` needs to be provided to use the nnc_poly key word constructor.")
         if "cons" in kwrds.keys():
             cons = kwrds.pop("cons")
             d_cons = max([c.space_dimension() for c in cons])
@@ -156,13 +156,14 @@ cdef class NNC_Polyhedron(object):
                 d = d_cons
             dd = d
             ss =  string_to_Spec_Elem("universe")
+            
             tt = string_to_Topol("nnc")
             self.thisptr = new Poly(dd, ss, tt)
             for c in cons:
                 cc = (<Constraint> c).thisptr[0] 
                 self.thisptr.add_con(cc)
             return
-        if kwrds["gens"]:
+        if "gens" in kwrds.keys():
             gens = kwrds.pop("gens")
             d_gens = max([g.space_dimension() for g in gens])
             if kwrds["dim_type"]:
@@ -178,7 +179,7 @@ cdef class NNC_Polyhedron(object):
                 gg = (<PPliteGenerator> g).thisptr[0] 
                 self.thisptr.add_gen(gg)
             return
-        raise ValueError("Poly Construction Failed")
+        raise KeyError("No valid keyword input for constructor of class given. ")
 
     def __cinit__(self):
         self.thisptr = NULL
@@ -520,6 +521,9 @@ cdef class NNC_Polyhedron(object):
         if isinstance(constraint, Constraint):
             c = (<Constraint> constraint).thisptr[0]
             self.thisptr[0].add_con(c)
+            return
+        raise TypeError("Constraint not added. Check if input is a :class:`Constraint`.")
+
 
     def add_constraints(self, iter_of_cons):
         """

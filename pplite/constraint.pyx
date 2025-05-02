@@ -140,9 +140,9 @@ cdef class Constraint(object):
 
     def coefficient(self, v):
         r"""
-        INPUT: Var v
+        INPUT: ``:class:Variable``
 
-        OUTPUT:
+        OUTPUT: The coefficient of the ``Variable``.
         TESTS:
         >>> from pplite import Variable, Linear_Expression, Affine_Expression, Constraint
         >>> x = Variable(0)
@@ -162,10 +162,17 @@ cdef class Constraint(object):
             var = Variable(v)
             vv = (<Variable> var).thisptr
         # else:
-        #     raise ValueError("Input is not a variable or an integer convertable to a FLINT_Integer.")
+        #     raise ValueError("Input is not a variable or an integer convertible to a FLINT_Integer.")
         cdef FLINT_Integer coeff
         coeff = self.thisptr.coeff(vv[0])
         return FLINT_Integer_to_Python(coeff)
+
+    def coefficients(self):
+        r"""
+        INPUT: None
+        OUPUT: A tuple of coefficients 
+        """
+        
 
     def linear_form(self):
         """
