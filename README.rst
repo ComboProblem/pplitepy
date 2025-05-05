@@ -1,7 +1,7 @@
 PPlite Python Wrapper
-==================
+=====================
 
-This Python package provides a wrapper to the C++ package `pplite <https://github.com/ezaffanella/PPLite/>`_.
+This Python package provides a wrapper to the C++ package `pplite <https://github.com/ezaffanella/PPLite/>`__.
 
 How it works
 ------------
@@ -80,7 +80,7 @@ the License, or (at your option) any later version. See http://www.gnu.org/licen
 Requirements
 ------------
 
-- `pplite <https://github.com/ezaffanella/PPLite>`_
+- `pplite <https://github.com/ezaffanella/PPLite>`__
 
 - `Cython <http://cython.org>`_ (tested with 3.0)
 
