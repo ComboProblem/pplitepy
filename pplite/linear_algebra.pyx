@@ -1034,7 +1034,7 @@ cdef class Affine_Expression(object):
     r"""
     Wrapper for PPLite's ``Affine_Expr`` class.
 
-    Note, this behaves analgolously to ppl's ``Linear_Expression`` class. 
+    Note, this behaves analogously to ppl's ``Linear_Expression`` class. 
 
     Examples:
 

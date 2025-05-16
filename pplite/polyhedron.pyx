@@ -156,7 +156,6 @@ cdef class NNC_Polyhedron(object):
                 d = d_cons
             dd = d
             ss =  string_to_Spec_Elem("universe")
-            
             tt = string_to_Topol("nnc")
             self.thisptr = new Poly(dd, ss, tt)
             for c in cons:
@@ -289,7 +288,7 @@ cdef class NNC_Polyhedron(object):
     def topology(self):
         pass
 
-    def space_dim(self):
+    def space_dimension(self):
         return self.thisptr.space_dim()
 
     def affine_dim(self):
@@ -324,8 +323,6 @@ cdef class NNC_Polyhedron(object):
             return self._relation_with_c(gen_or_constraint)
         except TypeError:
             return self._relation_with_g(gen_or_constraint)  # failure here will raise the right type error for the general method. 
-
-
 
     def min(self, affine_expr, value, included_pointer, gen_object):
         cdef Affine_Expr ae
@@ -484,7 +481,7 @@ cdef class NNC_Polyhedron(object):
         >>> P_2.add_constraint(A >= 0)
         >>> P_2.is_necessarily_closed()
         False
-        >>> P_2.space_dim()
+        >>> P_2.space_dimension()
         1
         >>> P_2.equals(P)
         True
@@ -657,6 +654,19 @@ cdef class NNC_Polyhedron(object):
     def minimize(self):
         self.thisptr[0].minimize()
 
+    def add_space_dimensions(self, dim_to_add, projection):
+        cdef cppbool project
+        if projection:
+            project = True
+        else:
+            project = False
+        cdef dim_type m
+        if isinstance(dim_to_add, int):
+            m = dim_to_add
+            self.thisptr[0].add_space_dims(m, project)
+        else:
+            raise TypeError("dim_to_add needs to be an ``int``.")
+
 #####################################
 ### Poly_Con_Rel and Poly_Gen_Rel ###
 #####################################
@@ -668,7 +678,21 @@ cdef class Polyhedron_Constraint_Rel(object):
         self.thisptr = NULL
     def __dealloc__(self):
         del self.thisptr
-
+    def __init__(self):
+        pass
+    def nothing(self):
+        pass
+    def is_disjoint(self):
+        pass
+    def strictly_intersects(self):
+        pass
+    def is_included(self):
+        pass
+    def saturates(self):
+        pass
+    def implies(self, other):
+        pass
+        
 cdef class Polyhedron_Generator_Rel(object):
     def __cinit__(self):
         self.thisptr = NULL

@@ -3,8 +3,8 @@
 import os
 import sys
 
-from setuptools import setup, Command
-from setuptools.extension import Extension
+from setuptools import setup, Command, Extension
+# from setuptools.extension import Extension
 
 # NOTE: setuptools build_ext does not work properly with Cython code
 from distutils.command.build_ext import build_ext as _build_ext
@@ -44,37 +44,37 @@ class build_ext(_build_ext):
 
         _build_ext.run(self)
 
-class TestCommand(Command):
-    user_options = []
+# class TestCommand(Command):
+#     user_options = []
 
-    def initialize_options(self):
-        pass
+#     def initialize_options(self):
+#         pass
 
-    def finalize_options(self):
-        pass
+#     def finalize_options(self):
+#         pass
 
-    def run(self):
-        import subprocess, os, tempfile, shutil
+#     def run(self):
+#         import subprocess, os, tempfile, shutil
 
-        old_path = os.getcwd()
-        tempdir_path = tempfile.mkdtemp()
-        try:
-            shutil.copytree('./tests', tempdir_path, dirs_exist_ok=True)
-            os.chdir(tempdir_path)
+#         old_path = os.getcwd()
+#         tempdir_path = tempfile.mkdtemp()
+#         try:
+#             shutil.copytree('./tests', tempdir_path, dirs_exist_ok=True)
+#             os.chdir(tempdir_path)
 
-            if subprocess.call([sys.executable, 'runtests.py']):
-                raise SystemExit("Doctest failures")
+#             if subprocess.call([sys.executable, 'runtests.py']):
+#                 raise SystemExit("Doctest failures")
 
-            if subprocess.call([sys.executable, 'setup.py', 'build_ext', '--inplace']) or \
-                    subprocess.call([sys.executable, '-c', "import testpplitepy; testpplitepy.test(); testpplitepy.example()"]):
-                raise SystemExit("Cython test 1 failure")
+#             if subprocess.call([sys.executable, 'setup.py', 'build_ext', '--inplace']) or \
+#                     subprocess.call([sys.executable, '-c', "import testpplitepy; testpplitepy.test(); testpplitepy.example()"]):
+#                 raise SystemExit("Cython test 1 failure")
 
-            if subprocess.call([sys.executable, 'setup2.py', 'build_ext', '--inplace']) or \
-                    subprocess.call([sys.executable, '-c', "import testpplitepy2; testpplitepy2.test(); testpplitepy2.example()"]):
-                raise SystemExit("Cython test 2 failure")
-        finally:
-            os.chdir(old_path)
-            shutil.rmtree(tempdir_path)
+#             if subprocess.call([sys.executable, 'setup2.py', 'build_ext', '--inplace']) or \
+#                     subprocess.call([sys.executable, '-c', "import testpplitepy2; testpplitepy2.test(); testpplitepy2.example()"]):
+#                 raise SystemExit("Cython test 2 failure")
+#         finally:
+#             os.chdir(old_path)
+#             shutil.rmtree(tempdir_path)
 
 extensions = [
     Extension('pplite.integer_conversions', sources=['pplite/integer_conversions.pyx']),
@@ -85,8 +85,10 @@ extensions = [
     Extension('pplite.bounding_box', sources=['pplite/bounding_box.pyx']),
     Extension('pplite.polyhedron', sources=['pplite/polyhedron.pyx'])
     ]
-#finish writing setup at some point
+
 setup(
     ext_modules = extensions,
-    cmdclass = {'build_ext': build_ext, 'test': TestCommand},
+    cmdclass = {'build_ext': build_ext},
+    # long_description=open('README.rst').read(),
+    # long_description_content_type='text/markdown',
 )

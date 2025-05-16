@@ -329,6 +329,12 @@ cdef class PPliteGenerator(object):
         n = self.thisptr.coeff(vv[0])
         return FLINT_Integer_to_Python(n)
 
+    # def coefficients(self):
+    #     """
+    #     Returns a list of coefficients for a given generator.
+    #     """
+    #     return [self.coefficient(v) for v in range(self.space_dimension())]
+
     def divisor(self):
         """
         TESTS:
@@ -344,7 +350,7 @@ cdef class PPliteGenerator(object):
         n = self.thisptr.divisor()
         return FLINT_Integer_to_Python(n)
 
-    def space_dimision(self):
+    def space_dimension(self):
         """
         TESTS:
         >>> from pplite import Variable, Linear_Expression, Affine_Expression, PPliteGenerator
@@ -352,7 +358,7 @@ cdef class PPliteGenerator(object):
         >>> y = Variable(1)
         >>> e = 2*x + 3*y
         >>> g = PPliteGenerator('point', e, 7)
-        >>> g.space_dimision()
+        >>> g.space_dimension()
         2
         """
         return self.thisptr.space_dim()
