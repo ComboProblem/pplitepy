@@ -13,7 +13,5 @@ cdef class Polyhedron_Constraint_Rel(object):
 cdef class Polyhedron_Generator_Rel(object):
     cdef Poly_Gen_Rel* thisptr
 
-
-
 # cdef class Constraint_Proxy(object):
 #     cdef Cons_Proxy c_proxy

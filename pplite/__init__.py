@@ -33,5 +33,5 @@ from .bounding_box import (
         )
 
 from .polyhedron import (
-        NNC_Polyhedron
+        NNC_Polyhedron, Polyhedron_Constraint_Rel
         )

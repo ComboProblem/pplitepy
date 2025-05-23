@@ -10,6 +10,7 @@ from .constraint cimport Constraint
 from .generators cimport PPliteGenerator
 from .linear_algebra cimport Variable, Linear_Expression, Affine_Expression
 from .intervals cimport Interval
+from cysignals.signals cimport sig_on, sig_off
 
 cdef class NNC_Polyhedron(object):
     r"""
@@ -677,18 +678,48 @@ cdef class Polyhedron_Constraint_Rel(object):
     def __cinit__(self):
         self.thisptr = NULL
     def __dealloc__(self):
+        # assert self.thisptr!=NULL
         del self.thisptr
-    def __init__(self):
+    def __repr__(self):
+        rel = []
+        if self.implies(Polyhedron_Constraint_Rel.is_disjoint()):
+            rel.append('is_disjoint')
+        if self.implies(Polyhedron_Constraint_Rel.strictly_intersects()):
+            rel.append('strictly_intersects')
+        if self.implies(Polyhedron_Constraint_Rel.is_included()):
+            rel.append('is_included')
+        if self.implies(Polyhedron_Constraint_Rel.saturates()):
+            rel.append('saturates')
+        if rel:
+            return ', '.join(rel)
+        else:
+            return 'nothing'       
+
+    @classmethod
+    def nothing(cls):
+        """
+        TESTS::
+        >>> from pplite import Polyhedron_Constraint_Rel
+        >>> Polyhedron_Constraint_Rel.nothing()
+        nothing
+        """
+        cdef Poly_Con_Rel rel  = PPlite_NOTHING
+        cdef Poly_Con_Rel * rel_pointer
+        sig_on()
+        try:
+            rel_pointer = &rel
+            relation = Polyhedron_Constraint_Rel()
+            relation.thisptr = rel_pointer
+        finally:
+            sig_off()
+        return relation
+    def is_disjoint(cls):
         pass
-    def nothing(self):
+    def strictly_intersects(cls):
         pass
-    def is_disjoint(self):
+    def is_included(cls):
         pass
-    def strictly_intersects(self):
-        pass
-    def is_included(self):
-        pass
-    def saturates(self):
+    def saturates(cls):
         pass
     def implies(self, other):
         pass
@@ -714,7 +745,7 @@ cdef Topol string_to_Topol(t):
     if  t == "nnc":
         tt = Topol.NNC
         return tt
-    raise ValueError("Topology type conversion failed.")
+    raise ValueError("Unrecognized string {0}.".format(t))
 
 cdef Spec_Elem string_to_Spec_Elem(s):
     cdef Spec_Elem ss
@@ -724,4 +755,24 @@ cdef Spec_Elem string_to_Spec_Elem(s):
     if  s == "universe":
         ss = Spec_Elem.UNIVERSE
         return ss
-    raise ValueError("Spec_Elem type conversion failed.")
+    raise ValueError("Unrecognized string {0}.".format(s))
+
+
+
+
+cdef Poly_Con_Rel _new_Poly_Con_Rel(s):
+    if s == "nothing":
+        return PPlite_NOTHING
+
+    raise ValueError("Unrecognized string {0}.".format(s))
+
+# cdef _new_Poly_Con_Rel_Nothing():
+#     cdef Poly_Con_Rel rel = Polyhedron_Constraint_Rel()
+#     rel.thisptr = new NOTHING
+#     return rel
+
+
+# cdef _new_Poly_Gen_Rel():
+#     rel = Polyhedron_Generator_Rel()
+#     rel.thisptr = new Poly_Gen_Rel()
+#     return rel

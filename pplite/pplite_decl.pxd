@@ -51,7 +51,7 @@ cdef extern from "flint/fmpq.h":
     void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
     void fmpq_set_si(fmpq_t res, slong p, ulong q)
 
-# Starting pplite definitons
+# Starting pplite definitions
 
 cdef extern from "pplite/pplite.hh" namespace "pplite":
 
@@ -415,7 +415,6 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
 
 # "pplite/Bits.hh"
 
-
     # "pplite/BBox.hh" 
     # Note: We are explicitly defining the two possible Box classes.
 
@@ -489,7 +488,6 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         cppbool inf_ub(dim_type i)
         const FLINT_Rational& lb(dim_type i)
         const FLINT_Rational& ub(dim_type i)
-
         # Itvs itvs
         # Volume_Info volume
 
@@ -573,7 +571,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         #     MINIMIZED
         #     PENDING
         # cdef struct Sys "Sys<Cons>"
-        # struct Sys_
+
         ctypedef struct cs "Sys<Cons>":
             pass
 
@@ -630,7 +628,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         cppbool max(const Affine_Expr& ae, FLINT_Rational& value, cppbool* included_ptr, Gen* g_ptr)
         Itv get_bounds(Var var)
         Itv get_bounds(Affine_Expr& ae)
-        # # Itv get_bounds(Itv_Expr& ie)
+        # Itv get_bounds(Itv_Expr& ie)
         # Index_Set get_unconstrained()
         size_t hash() 
         Cons_Proxy cons() # not directly used.
@@ -684,7 +682,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         void remove_higher_space_dims(dim_type new_dim)
         void expand_space_dim(Var var, dim_type m)
         # void fold_space_dims(const Index_Set& vars, Var dest) 
-        ## semantically const, but may affect syntactic reper
+        ## semantically const, but may affect syntactic representation 
         void minimize() 
 
     cppbool operator==(const Poly& x, const Poly& y)
@@ -713,7 +711,12 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         Poly_Gen_Rel subsumes()
         cppbool implies(const Poly_Gen_Rel& y)
 
-
+    Poly_Con_Rel PPlite_NOTHING "pplite::Poly_Con_Rel::nothing()"
+    # Poly_Con_Rel IS_DISJOINT "Poly::Impl::IS_DISJOINT"
+    # Poly_Con_Rel STRICTLY_INTERSECTS "Poly::Impl::STRICTLY_INTERSECTS"
+    # Poly_Con_Rel IS_INCLUDED "Poly::Impl::IS_INCLUDED"
+    # Poly_Con_Rel SATURATES "Poly::Impl::SATURATES"
+    # Poly_Con_Rel EVERYTHING "Poly::Impl::EVERYTHING"
 # PPLite/U_Poly.hh
 
     # cdef cppclass U_Wrap:
@@ -726,11 +729,3 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
 # "pplite/mater_iterator.hh"
     # cdef struct[Sys, Impl] Mater_Sys:
     #     pass
-
-
-
-#to do define Sys<Cons>
-#define Sys<Gens>
-# this is in Poly_Impl
-# where is cons?
-# general question, in C++ code, how do you quickly find the names of things/backtrace this. 
