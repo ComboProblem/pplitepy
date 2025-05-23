@@ -13,7 +13,7 @@ concurrency:
 jobs:
 
   sdists_for_pypi:
-    name: Build sdist (and upload to PyPI on release tags)
+    name: Build sdist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +39,8 @@ jobs:
             arch: x86_64
           - os: ubuntu-latest
             arch: i686
+          - os: ubuntu-24.04-arm
+            arch: aarch64
           - os: macos-13
             arch: auto
           - os: macos-14
