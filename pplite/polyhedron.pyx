@@ -302,10 +302,10 @@ cdef class NNC_Polyhedron(object):
             cc = (<Constraint> constraint).thisptr[0]
             p_c_r = self.thisptr[0].relation_with(cc)
             result = Polyhedron_Constraint_Rel()
-            result.thisptr[0] = p_c_r
+            result.thisptr = new Poly_Con_Rel(p_c_r)
             return result
         else:
-            raise TypeError()
+            raise TypeError("Here is a useful error")
 
     def _relation_with_g(self, generator):
         cdef Gen gg
@@ -314,7 +314,7 @@ cdef class NNC_Polyhedron(object):
             gg = (<PPliteGenerator> generator).thisptr[0]
             p_g_r = self.thisptr[0].relation_with(gg)
             result = Polyhedron_Generator_Rel()
-            result.thisptr[0] = p_g_r
+            result.thisptr = new Poly_Gen_Rel(p_g_r)
             return result
         else:
             raise TypeError("A :class:`PPliteGenerator` or a :class:`Constraint` should be passed into this method.")
@@ -530,7 +530,7 @@ cdef class NNC_Polyhedron(object):
         >>> A = Variable(0)
         >>> B = Variable(1)
         >>> cons_list = [A >= 0, B == 5]
-        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc") #TODO: Make nicer python constructors
+        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc") 
         >>> P.add_constraints(cons_list)
         >>> P_2 = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P_2.add_constraint(A >= 0)
@@ -557,7 +557,7 @@ cdef class NNC_Polyhedron(object):
         >>> P_2.add_constraint(A >= 0)
         >>> P_2.add_constraint(B >= 0)
         >>> P_2.minimize()
-        >>> P == P_2 # Test 01 finished
+        >>> P == P_2
         True
         >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P.add_constraint(A >= 0)
@@ -566,7 +566,7 @@ cdef class NNC_Polyhedron(object):
         >>> P.add_generator(Ray(-A))
         >>> P_2 = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P_2.add_constraint(B >= 0)
-        >>> P == P_2 # Test 03 finished
+        >>> P == P_2 
         True     
         """
         if isinstance(generator, PPliteGenerator):
@@ -672,8 +672,6 @@ cdef class NNC_Polyhedron(object):
 ### Poly_Con_Rel and Poly_Gen_Rel ###
 #####################################
 
-# TODO: Add full functionality of these classes.
-
 cdef class Polyhedron_Constraint_Rel(object):
     def __cinit__(self):
         self.thisptr = NULL
@@ -702,33 +700,79 @@ cdef class Polyhedron_Constraint_Rel(object):
         >>> from pplite import Polyhedron_Constraint_Rel
         >>> Polyhedron_Constraint_Rel.nothing()
         nothing
-        """
-        cdef Poly_Con_Rel rel  = PPlite_NOTHING
-        cdef Poly_Con_Rel * rel_pointer
-        sig_on()
-        try:
-            rel_pointer = &rel
-            relation = Polyhedron_Constraint_Rel()
-            relation.thisptr = rel_pointer
-        finally:
-            sig_off()
+        """ 
+        relation = Polyhedron_Constraint_Rel()
+        relation.thisptr = new Poly_Con_Rel(PPlite_NOTHING())
         return relation
+
+    @classmethod
     def is_disjoint(cls):
-        pass
+        relation = Polyhedron_Constraint_Rel()
+        relation.thisptr = new Poly_Con_Rel(PPlite_IS_DISJOINT())
+        return relation
+
+    @classmethod
     def strictly_intersects(cls):
-        pass
+        relation = Polyhedron_Constraint_Rel()
+        relation.thisptr = new Poly_Con_Rel(PPlite_STRICTLY_INTERSECTS())
+        return relation
+
+    @classmethod
     def is_included(cls):
-        pass
+        relation = Polyhedron_Constraint_Rel()
+        relation.thisptr = new Poly_Con_Rel(PPlite_IS_INCLUDED())
+        return relation
+
+    @classmethod
     def saturates(cls):
-        pass
-    def implies(self, other):
-        pass
+        relation = Polyhedron_Constraint_Rel()
+        relation.thisptr = new Poly_Con_Rel(PPlite_SATURATES())
+        return relation
+
+    def implies(self, Polyhedron_Constraint_Rel y):
+        return self.thisptr.implies(y.thisptr[0])
+
         
 cdef class Polyhedron_Generator_Rel(object):
     def __cinit__(self):
         self.thisptr = NULL
     def __dealloc__(self):
         del self.thisptr
+    def __repr__(self):
+        rel = []
+        if self.implies(Polyhedron_Constraint_Rel.is_disjoint()):
+            rel.append('is_disjoint')
+        if self.implies(Polyhedron_Constraint_Rel.strictly_intersects()):
+            rel.append('strictly_intersects')
+        if self.implies(Polyhedron_Constraint_Rel.is_included()):
+            rel.append('is_included')
+        if self.implies(Polyhedron_Constraint_Rel.saturates()):
+            rel.append('saturates')
+        if rel:
+            return ', '.join(rel)
+        else:
+            return 'nothing'       
+
+    @classmethod
+    def nothing(cls):
+        """
+        TESTS::
+        >>> from pplite import Polyhedron_Generator_Rel
+        >>> Polyhedron_Generator_Rel.nothing()
+        nothing
+        """ 
+        relation = Polyhedron_Generator_Rel()
+        relation.thisptr = new Poly_Gen_Rel(PPlite_Gen_NOTHING())
+        return relation
+
+    @classmethod
+    def subsumes(cls):
+        relation = Polyhedron_Generator_Rel()
+        relation.thisptr = new Poly_Gen_Rel(PPlite_SUBSUMES())
+        return relation
+
+    def implies(self, Polyhedron_Generator_Rel y):
+        return self.thisptr.implies(y.thisptr[0])
 
 
 # TODO Migrate helper functions to a helper function module.
@@ -760,11 +804,11 @@ cdef Spec_Elem string_to_Spec_Elem(s):
 
 
 
-cdef Poly_Con_Rel _new_Poly_Con_Rel(s):
-    if s == "nothing":
-        return PPlite_NOTHING
+# cdef Poly_Con_Rel _new_Poly_Con_Rel(s):
+#     if s == "nothing":
+#         return PPlite_NOTHING
 
-    raise ValueError("Unrecognized string {0}.".format(s))
+#     raise ValueError("Unrecognized string {0}.".format(s))
 
 # cdef _new_Poly_Con_Rel_Nothing():
 #     cdef Poly_Con_Rel rel = Polyhedron_Constraint_Rel()

@@ -693,6 +693,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
     cdef cppclass Poly_Con_Rel:
         ctypedef unsigned int Impl
         Poly_Con_Rel()
+        Poly_Con_Rel(const Poly_Con_Rel& rel) # Implicit copy constructor
         Impl& impl()
         Impl impl()
         Poly_Con_Rel nothing() 
@@ -702,22 +703,25 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         Poly_Con_Rel saturates()
         cppbool implies(const Poly_Con_Rel& y)
 
+    cdef Poly_Con_Rel PPlite_NOTHING "pplite::Poly_Con_Rel::nothing"()
+    cdef Poly_Con_Rel PPlite_IS_DISJOINT "pplite::Poly_Con_Rel::is_disjoint"()
+    cdef Poly_Con_Rel PPlite_STRICTLY_INTERSECTS "pplite::Poly_Con_Rel::strictly_intersects"()
+    cdef Poly_Con_Rel PPlite_IS_INCLUDED "pplite::Poly_Con_Rel::is_included"()
+    cdef Poly_Con_Rel PPlite_SATURATES "pplite::Poly_Con_Rel::saturates"()
+
     cdef cppclass Poly_Gen_Rel:
         ctypedef unsigned int Impl
         Poly_Gen_Rel()
+        Poly_Gen_Rel(const Poly_Gen_Rel& rel)
         Impl& impl()
         Impl impl()
         Poly_Gen_Rel nothing()
         Poly_Gen_Rel subsumes()
         cppbool implies(const Poly_Gen_Rel& y)
 
-    Poly_Con_Rel PPlite_NOTHING "pplite::Poly_Con_Rel::nothing()"
-    # Poly_Con_Rel IS_DISJOINT "Poly::Impl::IS_DISJOINT"
-    # Poly_Con_Rel STRICTLY_INTERSECTS "Poly::Impl::STRICTLY_INTERSECTS"
-    # Poly_Con_Rel IS_INCLUDED "Poly::Impl::IS_INCLUDED"
-    # Poly_Con_Rel SATURATES "Poly::Impl::SATURATES"
-    # Poly_Con_Rel EVERYTHING "Poly::Impl::EVERYTHING"
-# PPLite/U_Poly.hh
+    cdef Poly_Gen_Rel PPlite_Gen_NOTHING "pplite::Poly_Gen_Rel::nothing"()
+    cdef Poly_Gen_Rel PPlite_SUBSUMES "pplite::Poly_Gen_Rel::subsumes"()
+
 
     # cdef cppclass U_Wrap:
     # ctypedef struct Cons_Proxy:

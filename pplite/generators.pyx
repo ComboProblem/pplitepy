@@ -319,12 +319,19 @@ cdef class PPliteGenerator(object):
         >>> g = PPliteGenerator('point', e, 7)
         >>> g.coefficient(x)
         mpz(2)
+        >>> g.coefficient(0)
+        mpz(2)
+        >>> g.coefficient(1)
+        mpz(3)
+        >>> g.coefficient(3)
+        mpz(0)
         """
         cdef Var* vv
         if isinstance(v, Variable):
             vv = (<Variable> v).thisptr
         else:
-            vv = (<Variable> Variable(v)).thisptr
+            var = Variable(v)
+            vv = (<Variable> var).thisptr
         cdef FLINT_Integer n
         n = self.thisptr.coeff(vv[0])
         return FLINT_Integer_to_Python(n)

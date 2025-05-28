@@ -10,7 +10,7 @@ AUTHORS:
 - Acadia Larsen (2024): initial version.
 """
 
-__version__ = "0.0.52"
+__version__ = "0.0.53"
 
 from .linear_algebra import (
         Variable, Linear_Expression, Affine_Expression
@@ -33,5 +33,5 @@ from .bounding_box import (
         )
 
 from .polyhedron import (
-        NNC_Polyhedron, Polyhedron_Constraint_Rel
+        NNC_Polyhedron, Polyhedron_Constraint_Rel, Polyhedron_Generator_Rel
         )
