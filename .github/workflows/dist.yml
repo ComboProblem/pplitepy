@@ -356,6 +356,7 @@ jobs:
   pypi-publish:
     needs: [build_wheels, build_wheels_windows]
     name: Upload release to PyPI
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -381,4 +382,3 @@ jobs:
         ## password: ${{ secrets.SAGEMATH_PYPI_API_TOKEN }}
         skip_existing: true
         verbose: true
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
