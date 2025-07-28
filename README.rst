@@ -68,7 +68,7 @@ https://github.com/ComboProblem/pplitepy
 Documentation
 -------------
 
-TBD.
+There is minimal documentation as in pplite.
 
 License
 -------
