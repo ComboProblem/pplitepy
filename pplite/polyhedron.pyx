@@ -276,7 +276,7 @@ cdef class NNC_Polyhedron(object):
         raise TypeError("other_poly needs to be of :class:`NNC_Polyhedron`")
 
     def get_bounding_box(self):
-        pass
+        raise NotImplementedError
 
     def boxed_contains(self, other_poly):
         cdef Poly* yy
@@ -372,7 +372,7 @@ cdef class NNC_Polyhedron(object):
         return i
         
     def _get_boundes_itv(self, itv_expr):
-        pass
+        raise NotImplementedError
 
     def get_bounds(self, variable_or_affine_expr):
         if isinstance(variable_or_affine_expr, Variable):
@@ -382,27 +382,31 @@ cdef class NNC_Polyhedron(object):
         raise TypeError("A :class:`Variable` or a :class:`Affine_Expression` should be passed into this method.")
 
     def get_unconstrainted(self):
-        pass
+        raise NotImplementedError
 
+
+# For both the constraints and generators methods should be implemented via cons_sys and gens_sys. 
+# At the moment, we use the copy constructor because it was easier to write. 
     def constraints(self):
-        # Access constraints indirectly via copy_cons()
-        # TODO: Properly implement via sys and Cons_Proxy in Poly_Impl
+        """
+        Returns a list of :class:`Constraint` of the polyhedron. 
+
+        Note: the constraints space dim is not necessarily the ambient space dim of the poly. 
+        """
         cdef Cons constraint_vector 
         constraint_vector = self.thisptr[0].copy_cons()
         result = []
         cdef unsigned int index = constraint_vector.size() # hacky way to iterate over vectors
         for i in range(index):
-            c = Constraint()
+            c = Constraint(i)
             c.thisptr = new Con(constraint_vector[i])
             result.append(c)
         return result
 
     def generators(self):
         """
-        Returns a list of :class:`PPliteGenerator`.
+        Returns a list of :class:`PPliteGenerator`of the polyhedron.
         """
-        # Access constraints indirectly via copy_cons()
-        # TODO: Properly implement via sys and Cons_Proxy in Poly_Impl
         cdef Gens generator_vector 
         generator_vector = self.thisptr[0].copy_gens()
         result = []
@@ -414,8 +418,7 @@ cdef class NNC_Polyhedron(object):
         return result
 
     def normalized_constraints(self):
-        # TODO implement once Cons_Proxy is implemented. 
-        pass
+        raise NotImplementedError
 
     def num_min_constrains(self):
         return self.thisptr[0].num_min_cons()
@@ -461,6 +464,9 @@ cdef class NNC_Polyhedron(object):
         self.thisptr[0].set_empty()
 
     def set_topology(self, topology):
+        """
+        Sets the topology of the NNC polyhedron as either "closed" or "nnc".
+        """
         cdef Topol tt
         tt = string_to_Topol(topology)
         self.thisptr[0].set_topology(tt)
@@ -585,8 +591,9 @@ cdef class NNC_Polyhedron(object):
             v = (<Variable> variable).thisptr
             self.thisptr[0].unconstrain(v[0])
 
-    def unconstain_many(self, iter_of_var_or_index_set):
-        pass
+    def unconstain_many(self, iter_of_vars):
+        for var in iter_of_vars:
+            self.unconstain(var)
 
     def intersection_assign(self, other_poly):
         if isinstance(other_poly, NNC_Polyhedron):
@@ -640,20 +647,32 @@ cdef class NNC_Polyhedron(object):
         den = Python_int_to_FLINT_Integer(denominator)
         self.thisptr[0].affine_preimage(var[0], expr, inhomo, den)        
     
-    # TODO: Implement these   
-    def parallel_affine_image(self, args):
-        pass
+    def parallel_affine_image(self):
+        raise NotImplementedError
 
     def widing_assign(self, args):
-        pass
+        raise NotImplementedError
 
     def time_elapse_assign(self, other_poly):
         if isinstance(other_poly, NNC_Polyhedron):
             y = (<NNC_Polyhedron> other_poly).thisptr
             self.thisptr[0].time_elapse_assign(y[0])
 
-    def minimize(self):
-        self.thisptr[0].minimize()
+    def split(self, constraint, topology):
+        if isinstance(constraint, Constraint):
+            con = (<Constraint> constraint).thisptr
+        cdef Topol tt
+        tt = string_to_Topol(topology)
+        new_poly = NNC_Polyhedron()
+        new_poly.thisptr = new Poly(self.thisptr[0].split(con[0], tt))
+        return new_poly
+
+    def integral_split(self, constraint):
+        if isinstance(constraint, Constraint):
+            con = (<Constraint> constraint).thisptr
+        new_poly = NNC_Polyhedron()
+        new_poly.thisptr = new Poly(self.thisptr[0].integral_split(con[0]))
+        return new_poly
 
     def add_space_dimensions(self, dim_to_add, projection):
         cdef cppbool project
@@ -667,6 +686,26 @@ cdef class NNC_Polyhedron(object):
             self.thisptr[0].add_space_dims(m, project)
         else:
             raise TypeError("dim_to_add needs to be an ``int``.")
+
+    def concatenate_assign(self, poly):
+        if isinstance(poly, NNC_Polyhedron):
+            p = (<NNC_Polyhedron>  poly).thisptr
+        self.thisptr[0].concatenate_assign(p[0])
+
+    def remove_higher_space_dims(self, new_dim):
+        cdef dim_type d
+        d = Python_int_to_FLINT_Integer(new_dim)
+        self.thisptr[0].remove_higher_space_dims(d)
+
+    def expand_space_dim(self, variable, dim_m):
+        cdef dim_type d
+        d = Python_int_to_FLINT_Integer(dim_m)
+        if isinstance(variable, Variable):
+            var = (<Variable> variable).thisptr
+        self.thisptr[0].expand_space_dim(var[0], d)
+
+    def minimize(self):
+        self.thisptr[0].minimize()
 
 #####################################
 ### Poly_Con_Rel and Poly_Gen_Rel ###
@@ -774,9 +813,6 @@ cdef class Polyhedron_Generator_Rel(object):
     def implies(self, Polyhedron_Generator_Rel y):
         return self.thisptr.implies(y.thisptr[0])
 
-
-# TODO Migrate helper functions to a helper function module.
-
 #########################
 ###  Helper Functions ###
 #########################
@@ -800,23 +836,3 @@ cdef Spec_Elem string_to_Spec_Elem(s):
         ss = Spec_Elem.UNIVERSE
         return ss
     raise ValueError("Unrecognized string {0}.".format(s))
-
-
-
-
-# cdef Poly_Con_Rel _new_Poly_Con_Rel(s):
-#     if s == "nothing":
-#         return PPlite_NOTHING
-
-#     raise ValueError("Unrecognized string {0}.".format(s))
-
-# cdef _new_Poly_Con_Rel_Nothing():
-#     cdef Poly_Con_Rel rel = Polyhedron_Constraint_Rel()
-#     rel.thisptr = new NOTHING
-#     return rel
-
-
-# cdef _new_Poly_Gen_Rel():
-#     rel = Polyhedron_Generator_Rel()
-#     rel.thisptr = new Poly_Gen_Rel()
-#     return rel

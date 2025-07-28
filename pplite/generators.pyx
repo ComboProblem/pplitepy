@@ -460,8 +460,6 @@ def Ray(linear_expression):
 ### Helper Functions ###
 ########################
 
-# TODO migrate helper functions to a single module. 
-
 cdef GenType string_to_GenType(t):
     """
     Converts a string to an enum pplite::GenType.

@@ -172,7 +172,7 @@ cdef class Constraint(object):
         INPUT: None
         OUPUT: A tuple of coefficients 
         """
-        
+        raise NotImplementedError
 
     def linear_form(self):
         """
@@ -587,10 +587,10 @@ cdef _make_Constraint_from_richcmp(lhs_, rhs_, op):
             raise NotImplementedError
         else:
             assert(False)
-    if isinstance(lhs_, Variable): # variable not explitly declared. promote var to linear expression and compare. 
+    if isinstance(lhs_, Variable): # Variable not explicitly declared. Promote var to linear expression and compare. 
         lhs_ = Linear_Expression(lhs_)
         return _make_Constraint_from_richcmp(lhs_, rhs_, op)
-    if isinstance(rhs_, Variable): # variable not explitly declared. promote var to linear expression and compare. 
+    if isinstance(rhs_, Variable): # Variable not explicitly declared. Promote var to linear expression and compare. 
         rhs_ = Linear_Expression(rhs_)
         return _make_Constraint_from_richcmp(lhs_, rhs_, op)
 
@@ -605,7 +605,6 @@ cdef _wrap_Constraint(Con constraint):
 
 
 # Reproduction of these functions here is necessary. Removing this causes things to break.
-# Investigation is pending.
 cdef FLINT_Integer_to_Python(FLINT_Integer& integer):
     r""" Converts FLINT_Integer to python integer."""
     cdef mpz_t new_int
@@ -631,7 +630,7 @@ cdef FLINT_Integer Python_int_to_FLINT_Integer(integer):
 
 def FLINT_Integer_Conversion_Check(possible_integer):
     """
-    Checks a python object is convertable to a FLINT_Integer.
+    Checks a python object is convertible to a FLINT_Integer.
 
     Input: Object
 

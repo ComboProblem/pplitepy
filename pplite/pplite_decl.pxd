@@ -565,6 +565,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
 
 
 # "pplite/Poly.hh"
+    cdef cppclass Poly_Impl
     cdef cppclass Poly_Impl:
         # enum Status:
         #     EMPTY
@@ -578,16 +579,21 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         ctypedef struct gs "Sys<Gens>":
             pass
 
+# This comes down to figuring out the namespace schematics
+# Cons_Proxy is an alias for Mater_Sys<Sys<Cons>, Poly_Impl>
+# using Cons_Proxy = Mater_Sys<Sys<Cons>, Poly_Impl>;
+# using is something that can be redone as a typedef
+# How does the using keyword play into the cython side in terms of alising?
+            
+    # ctypedef struct Cons_Proxy: # "pplite::Mater_Sys<pplite::Poly_Impl::Sys<pplite::Cons>, pplite::Poly_Impl>": # Cons_Proxy
+    #     pass 
 
-        # ctypedef struct Cons_Proxy "pplite::Mater_Sys<pplite::Poly_Impl::Sys<pplite::Cons>, pplite::Poly_Impl>": # Cons_Proxy
-        #     pass 
+    # ctypedef srutct Gens_Proxy: # "pplite::Mater_Sys<pplite::Poly_Impl::Sys<pplite::Gens>, pplite::Poly_Impl>": # Gens_Proxy
+    #     pass  
 
-        # ctypedef struct Gens_Proxy "pplite::Mater_Sys<pplite::Poly_Impl::Sys<pplite::Gens>, pplite::Poly_Impl>": # Gens_Proxy
-        #     pass  
-    
-
+    cdef cppclass Poly
     cdef cppclass Poly:
-        Impl cppclass "pplite::Poly::Poly_Impl" # guess on how to alias this
+        Impl cppclass "pplite::Poly_Impl" # guess on how to alias this
         Poly(dim_type d, Spec_Elem s, Topol t)
         Poly(dim_type d, Topol t, Spec_Elem s)
         Poly(Spec_Elem s, Topol t, dim_type d)
@@ -595,12 +601,12 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
         Poly(Topol t, Spec_Elem s, dim_type d)
         Poly(Poly& y)
         Poly& operator=(Poly& y)
-        Impl impl()
+        Impl impl() 
   # /* Types */
-        ctypedef struct Cons_Proxy "Impl::Cons_Proxy":   # using Impl::Cons_Proxy;
+        ctypedef struct Cons_Proxy "Cons_Proxy":   # using Impl::Cons_Proxy;
             pass # treat as container protocol, just try to iterate over it and don't worry too much about wrapping properly
-            # these are c++ implementation details 
-        ctypedef struct Gens_Proxy "Impl::Gens_Proxy":   # using Impl::Gens_Proxy;
+        #     # these are c++ implementation details 
+        ctypedef struct Gens_Proxy "Gens_Proxy":   # using Impl::Gens_Proxy;
             pass
     # /* Predicates */
         cppbool is_necessarily_closed()
@@ -690,6 +696,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
 
 
 # PPlite/Poly_Rel.hh
+    cdef cppclass Poly_Con_Rel
     cdef cppclass Poly_Con_Rel:
         ctypedef unsigned int Impl
         Poly_Con_Rel()
@@ -709,6 +716,7 @@ cdef extern from "pplite/pplite.hh" namespace "pplite":
     cdef Poly_Con_Rel PPlite_IS_INCLUDED "pplite::Poly_Con_Rel::is_included"()
     cdef Poly_Con_Rel PPlite_SATURATES "pplite::Poly_Con_Rel::saturates"()
 
+    cdef cppclass Poly_Gen_Rel
     cdef cppclass Poly_Gen_Rel:
         ctypedef unsigned int Impl
         Poly_Gen_Rel()

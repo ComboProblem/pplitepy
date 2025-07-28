@@ -29,7 +29,7 @@ cdef FLINT_Integer Python_int_to_FLINT_Integer(integer):
         fmpz_init(x)
         fmpz_set_si(x, integer)
         return FLINT_Integer(x)
-    if MPZ_Check(integer): # is this okay?
+    if MPZ_Check(integer): # This is a little hacky...
         y = <fmpz> integer
         return FLINT_Integer(y)
     raise ValueError("Integer Conversion Failed")
@@ -453,11 +453,9 @@ cdef class Linear_Expression(object):
     mpz(1)
     >>> expr.coefficient(Variable(124))
     mpz(0)
-
-    String, rationals and floating point types are accepted as long as they
-    represent exact integers:
     """
-    # TODO: Finish Tests/claim above.
+    # TODO: Check that string, rationals and floating point types are accepted as long as they
+    # represent exact integers.
     def __init__(self, *args):
         """
         The Cython constructor.
