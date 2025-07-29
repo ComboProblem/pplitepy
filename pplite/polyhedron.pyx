@@ -693,16 +693,18 @@ cdef class NNC_Polyhedron(object):
         self.thisptr[0].concatenate_assign(p[0])
 
     def remove_higher_space_dims(self, new_dim):
-        cdef dim_type d
-        d = Python_int_to_FLINT_Integer(new_dim)
-        self.thisptr[0].remove_higher_space_dims(d)
+        cdef dim_type dim
+        if isinstance(new_dim, int):
+            dim = new_dim
+        self.thisptr[0].remove_higher_space_dims(dim)
 
     def expand_space_dim(self, variable, dim_m):
-        cdef dim_type d
-        d = Python_int_to_FLINT_Integer(dim_m)
+        cdef dim_type dim
+        if isinstance(dim_m, int):
+            dim = dim_m
         if isinstance(variable, Variable):
             var = (<Variable> variable).thisptr
-        self.thisptr[0].expand_space_dim(var[0], d)
+        self.thisptr[0].expand_space_dim(var[0], dim)
 
     def minimize(self):
         self.thisptr[0].minimize()
