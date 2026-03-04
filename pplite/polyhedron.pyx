@@ -10,12 +10,12 @@ from .constraint cimport Constraint
 from .generators cimport PPliteGenerator
 from .linear_algebra cimport Variable, Linear_Expression, Affine_Expression
 from .intervals cimport Interval
-from cysignals.signals cimport sig_on, sig_off
+# from cysignals.signals cimport sig_on, sig_off
 
 cdef class NNC_Polyhedron(object):
     r"""
     Wrapper for PPLite's ``Poly`` class.
-    
+
     INPUT:
 
     - dim_type (int), spec_elem (string "universe" or "empty"), and topology ("closed" or "nnc") xor,
@@ -60,7 +60,7 @@ cdef class NNC_Polyhedron(object):
     >>> P.add_constraint(x>0)
     >>> P.add_constraint(y>0)
     >>> P
-    x0>0, x1>0   
+    x0>0, x1>0
     >>> P_2 = NNC_Polyhedron(nnc_poly = P)
     >>> P_2
     x0>0, x1>0
@@ -90,7 +90,7 @@ cdef class NNC_Polyhedron(object):
 
     >>> P_2 = NNC_Polyhedron(cons = [x>0, y>0])
     >>> P == P_2
-    True    
+    True
     """
     def __init__(self, **kwrds):
         """
@@ -134,7 +134,7 @@ cdef class NNC_Polyhedron(object):
             s = kwrds.pop("spec_elem")
             t = kwrds.pop("topology")
             if isinstance(d, int):
-                dd = d # needs to be a python int? Gotta figure out how to typed integer conversions. Ask about this. 
+                dd = d # needs to be a python int? Gotta figure out how to typed integer conversions. Ask about this.
                 ss = string_to_Spec_Elem(s)
                 tt = string_to_Topol(t)
                 self.thisptr = new Poly(dd, ss, tt)
@@ -160,7 +160,7 @@ cdef class NNC_Polyhedron(object):
             tt = string_to_Topol("nnc")
             self.thisptr = new Poly(dd, ss, tt)
             for c in cons:
-                cc = (<Constraint> c).thisptr[0] 
+                cc = (<Constraint> c).thisptr[0]
                 self.thisptr.add_con(cc)
             return
         if "gens" in kwrds.keys():
@@ -176,7 +176,7 @@ cdef class NNC_Polyhedron(object):
             tt = string_to_Topol("nnc")
             self.thisptr = new Poly(dd, ss, tt)
             for g in gens:
-                gg = (<PPliteGenerator> g).thisptr[0] 
+                gg = (<PPliteGenerator> g).thisptr[0]
                 self.thisptr.add_gen(gg)
             return
         raise KeyError("No valid keyword input for constructor of class given. ")
@@ -192,7 +192,7 @@ cdef class NNC_Polyhedron(object):
 
     def __repr__(self):
         s = ""
-        if self.is_empty(): 
+        if self.is_empty():
             s = "false" # from pplite::Poly_Impl::print()
             return s
         self.minimize()
@@ -323,7 +323,7 @@ cdef class NNC_Polyhedron(object):
         try:
             return self._relation_with_c(gen_or_constraint)
         except TypeError:
-            return self._relation_with_g(gen_or_constraint)  # failure here will raise the right type error for the general method. 
+            return self._relation_with_g(gen_or_constraint)  # failure here will raise the right type error for the general method.
 
     def min(self, affine_expr, value, included_pointer, gen_object):
         cdef Affine_Expr ae
@@ -355,7 +355,7 @@ cdef class NNC_Polyhedron(object):
 
     def _get_bounds_v(self, variable):
         cdef Var* v
-        cdef Itv itv 
+        cdef Itv itv
         v = (<Variable> variable).thisptr
         itv = self.thisptr[0].get_bounds(v[0])
         i = Interval()
@@ -364,13 +364,13 @@ cdef class NNC_Polyhedron(object):
 
     def _get_bounds_ae(self, affine_expr):
         cdef Affine_Expr ae
-        cdef Itv itv 
+        cdef Itv itv
         ae = (<Affine_Expression> affine_expr).thisptr[0]
         itv = self.thisptr[0].get_bounds(ae)
         i = Interval()
         i.interval = itv
         return i
-        
+
     def _get_boundes_itv(self, itv_expr):
         raise NotImplementedError
 
@@ -385,20 +385,20 @@ cdef class NNC_Polyhedron(object):
         raise NotImplementedError
 
 
-# For both the constraints and generators methods should be implemented via cons_sys and gens_sys. 
-# At the moment, we use the copy constructor because it was easier to write. 
+# For both the constraints and generators methods should be implemented via cons_sys and gens_sys.
+# At the moment, we use the copy constructor because it was easier to write.
     def constraints(self):
         """
-        Returns a list of :class:`Constraint` of the polyhedron. 
+        Returns a list of :class:`Constraint` of the polyhedron.
 
-        Note: the constraints space dim is not necessarily the ambient space dim of the poly. 
+        Note: the constraints space dim is not necessarily the ambient space dim of the poly.
         """
-        cdef Cons constraint_vector 
+        cdef Cons constraint_vector
         constraint_vector = self.thisptr[0].copy_cons()
         result = []
         cdef unsigned int index = constraint_vector.size() # hacky way to iterate over vectors
         for i in range(index):
-            c = Constraint(i)
+            c = Constraint()
             c.thisptr = new Con(constraint_vector[i])
             result.append(c)
         return result
@@ -407,7 +407,7 @@ cdef class NNC_Polyhedron(object):
         """
         Returns a list of :class:`PPliteGenerator`of the polyhedron.
         """
-        cdef Gens generator_vector 
+        cdef Gens generator_vector
         generator_vector = self.thisptr[0].copy_gens()
         result = []
         cdef unsigned int index = generator_vector.size()
@@ -436,7 +436,7 @@ cdef class NNC_Polyhedron(object):
         return self.thisptr[0].num_disjuncts()
 
     def disjunct_constraints(self, n):
-        # TODO implement once Cons_Proxy is implemented. 
+        # TODO implement once Cons_Proxy is implemented.
         # cdef dim_type nn
         # if isinstance(n, int):
         #     nn = n
@@ -459,7 +459,7 @@ cdef class NNC_Polyhedron(object):
 
     def set_empty(self):
         """
-        Sets the :class:`NNC_Polyhedron` to empty. 
+        Sets the :class:`NNC_Polyhedron` to empty.
         """
         self.thisptr[0].set_empty()
 
@@ -471,7 +471,7 @@ cdef class NNC_Polyhedron(object):
         tt = string_to_Topol(topology)
         self.thisptr[0].set_topology(tt)
 
-    def add_constraint(self, constraint):  
+    def add_constraint(self, constraint):
         r"""
         TESTS::
         >>> from pplite import NNC_Polyhedron, Variable, Linear_Expression, Affine_Expression, Constraint, Point, Ray, Line, Closure_point
@@ -493,7 +493,7 @@ cdef class NNC_Polyhedron(object):
         >>> P_2.equals(P)
         True
         >>> B = Variable(1)
-        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "empty", topology = "nnc") 
+        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "empty", topology = "nnc")
         >>> P_2 = NNC_Polyhedron(nnc_poly = P)
         >>> P.add_constraint(A == B)
         >>> P_2 == P
@@ -536,7 +536,7 @@ cdef class NNC_Polyhedron(object):
         >>> A = Variable(0)
         >>> B = Variable(1)
         >>> cons_list = [A >= 0, B == 5]
-        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc") 
+        >>> P = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P.add_constraints(cons_list)
         >>> P_2 = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P_2.add_constraint(A >= 0)
@@ -572,8 +572,8 @@ cdef class NNC_Polyhedron(object):
         >>> P.add_generator(Ray(-A))
         >>> P_2 = NNC_Polyhedron(dim_type = 2, spec_elem = "universe", topology = "nnc")
         >>> P_2.add_constraint(B >= 0)
-        >>> P == P_2 
-        True     
+        >>> P == P_2
+        True
         """
         if isinstance(generator, PPliteGenerator):
             g = (<PPliteGenerator> generator).thisptr[0]
@@ -645,8 +645,8 @@ cdef class NNC_Polyhedron(object):
         cdef FLINT_Integer den
         inhomo = Python_int_to_FLINT_Integer(inhomogenous_term)
         den = Python_int_to_FLINT_Integer(denominator)
-        self.thisptr[0].affine_preimage(var[0], expr, inhomo, den)        
-    
+        self.thisptr[0].affine_preimage(var[0], expr, inhomo, den)
+
     def parallel_affine_image(self):
         raise NotImplementedError
 
@@ -732,7 +732,7 @@ cdef class Polyhedron_Constraint_Rel(object):
         if rel:
             return ', '.join(rel)
         else:
-            return 'nothing'       
+            return 'nothing'
 
     @classmethod
     def nothing(cls):
@@ -741,7 +741,7 @@ cdef class Polyhedron_Constraint_Rel(object):
         >>> from pplite import Polyhedron_Constraint_Rel
         >>> Polyhedron_Constraint_Rel.nothing()
         nothing
-        """ 
+        """
         relation = Polyhedron_Constraint_Rel()
         relation.thisptr = new Poly_Con_Rel(PPlite_NOTHING())
         return relation
@@ -773,7 +773,7 @@ cdef class Polyhedron_Constraint_Rel(object):
     def implies(self, Polyhedron_Constraint_Rel y):
         return self.thisptr.implies(y.thisptr[0])
 
-        
+
 cdef class Polyhedron_Generator_Rel(object):
     def __cinit__(self):
         self.thisptr = NULL
@@ -792,7 +792,7 @@ cdef class Polyhedron_Generator_Rel(object):
         if rel:
             return ', '.join(rel)
         else:
-            return 'nothing'       
+            return 'nothing'
 
     @classmethod
     def nothing(cls):
@@ -801,7 +801,7 @@ cdef class Polyhedron_Generator_Rel(object):
         >>> from pplite import Polyhedron_Generator_Rel
         >>> Polyhedron_Generator_Rel.nothing()
         nothing
-        """ 
+        """
         relation = Polyhedron_Generator_Rel()
         relation.thisptr = new Poly_Gen_Rel(PPlite_Gen_NOTHING())
         return relation
