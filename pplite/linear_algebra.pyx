@@ -3,36 +3,17 @@
 
 cimport cython
 
-from gmpy2 cimport import_gmpy2, mpz, mpz_t, GMPy_MPZ_From_mpz, MPZ_Check
+#from flint import fmpz as py_fmpz
+#from flint.flintlib.functions.fmpz cimport fmpz_t
+#from flint cimport f
+from gmpy2 cimport import_gmpy2, mpz, mpz_t, GMPy_MPZ_From_mpz, GMPy_MPZ_New, MPZ_Check, MPZ
 from libcpp.vector cimport vector as cppvector
 from .constraint cimport _make_Constraint_from_richcmp
-# from .integer_conversions cimport FLINT_Integer_to_Python, Python_int_to_FLINT_Integer
+from .integer_conversions cimport FLINT_Integer_to_Python, Python_int_to_FLINT_Integer
 
-# TODO: Investigate why everything breaks when importing integer conversion as opposed to local definitions. 
+# TODO: Once C API is avilable from python-flint; use this to work with flint integers rather than using the copy and pasted subcode like MPZ does for ppl.
 
 import_gmpy2()
-
-cdef FLINT_Integer_to_Python(FLINT_Integer& integer):
-    r""" Converts PPLite::FLINT_Integer to python integer."""
-    cdef mpz_t new_int
-    mpz_init(new_int)
-    fmpz_get_mpz(new_int, integer.impl())
-    y = GMPy_MPZ_From_mpz(new_int)
-    mpz_clear(new_int)
-    return y
-
-cdef FLINT_Integer Python_int_to_FLINT_Integer(integer):
-    r"""Converts python sting or int to a PPLite::FLINT_Integer."""
-    cdef fmpz_t x
-    cdef fmpz y
-    if isinstance(integer, (int, str)):
-        fmpz_init(x)
-        fmpz_set_si(x, integer)
-        return FLINT_Integer(x)
-    if MPZ_Check(integer): # This is a little hacky...
-        y = <fmpz> integer
-        return FLINT_Integer(y)
-    raise ValueError("Integer Conversion Failed")
 
 ################
 ### Variable ###

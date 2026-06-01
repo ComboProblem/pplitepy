@@ -5,11 +5,22 @@ from libcpp.vector cimport vector as cppvector
 from libcpp.utility cimport pair
 from gmpy2 cimport mpz 
 
+cdef extern from "Python.h":
+    ctypedef void PyObject
+
 # gmp and flint integer/rational cdefs 
 
+# TODO: When python-flint exposes the C-API, These headers will need to be refactored. 
+
 cdef extern from "gmp.h":
+    ctypedef unsigned long ulong
     ctypedef unsigned long mp_limb_t
+    ctypedef long mp_size_t
+    ctypedef long mp_exp_t
     ctypedef long mp_limb_signed_t
+    ctypedef mp_limb_t* mp_ptr
+    ctypedef mp_limb_t* mp_srcptr
+    ctypedef unsigned long mp_bitcnt_t
     ctypedef struct __mpz_struct:
         pass
     ctypedef __mpz_struct mpz_t[1]
@@ -18,6 +29,99 @@ cdef extern from "gmp.h":
     void mpz_init(mpz_t)
     void mpz_clear(mpz_t)
     cdef mpz_t* address_of_mpz "&"(mpz_t x)
+
+#ctypedef mp_limb_t ulong
+#ctypedef mp_limb_signed_t slong
+
+
+cdef extern from "flint/fmpz.h":
+    ctypedef long slong
+    ctypedef ulong flint_bitcnt_t
+    ctypedef ulong * nn_ptr
+    ctypedef const ulong * nn_srcptr
+
+ctypedef slong fmpz_struct
+ctypedef fmpz_struct fmpz_t[1]
+
+cdef extern from "flint/fmpz.h":
+    void fmpz_init(fmpz_t f)
+    void fmpz_clear(fmpz_t f)
+    void fmpz_abs(fmpz_t f1, const fmpz_t f2)
+    void fmpz_get_ui_array(ulong * out, slong n, const fmpz_t in_)
+    void fmpz_set_signed_ui_array(fmpz_t out, const ulong * in_, slong n)
+    void fmpz_set_si(fmpz_t f, slong val)
+    int fmpz_sgn(const fmpz_t f)
+    flint_bitcnt_t fmpz_bits(const fmpz_t f)
+
+
+cdef extern from "flint/fmpz.h":
+    # Macros
+    int COEFF_IS_MPZ(fmpz_struct x)
+
+cdef extern from *:
+    """
+    #if __FLINT_RELEASE < 30200 /* Flint < 3.2.0 */
+
+    /* Functions renamed in Flint 3.2.0 */
+    #define flint_rand_init flint_randinit
+    #define flint_rand_clear flint_randclear
+
+    #endif
+    """
+
+cdef extern from "flint/flint.h":
+    # These defines are needed to work around a Cython bug.
+    # Otherwise sizeof(ulong) will give the wrong size on 64 bit Windows.
+    # https://github.com/cython/cython/issues/6339
+    """
+    #define SIZEOF_ULONG sizeof(ulong)
+    #define SIZEOF_SLONG sizeof(slong)
+    """
+    int SIZEOF_ULONG
+    int SIZEOF_SLONG
+
+    ctypedef struct __FLINT_FILE:
+        pass
+    ctypedef __FLINT_FILE FLINT_FILE
+
+    const char * FLINT_VERSION
+    const int __FLINT_RELEASE
+
+    const int FLINT_BITS
+
+    ctypedef void * flint_rand_t
+    void flint_rand_init(flint_rand_t state)
+    void flint_rand_clear(flint_rand_t state)
+
+    void flint_set_num_threads(long)
+    long flint_get_num_threads()
+
+    void flint_cleanup()
+
+    ctypedef struct nmod_t:
+        mp_limb_t n
+        mp_limb_t ninv
+        flint_bitcnt_t norm
+
+    ctypedef struct fmpq:
+        fmpz_struct num
+        fmpz_struct den
+
+cdef extern from *:
+    """
+    /* FLINT_BITS is not known until C compile time. We need to check if long
+     * or long long matches FLINT_BITS to know which CPython function to call.
+     */
+    #if FLINT_BITS == 32 && LONG_MAX == 2147483647
+    #define pylong_as_slong PyLong_AsLongAndOverflow
+    #elif FLINT_BITS == 64 && LLONG_MAX == 9223372036854775807
+    #define pylong_as_slong PyLong_AsLongLongAndOverflow
+    #else
+    #error FLINT_BITS does not match width of long or long long.
+    #endif
+    """
+    slong pylong_as_slong(PyObject *pylong, int *overflow)
+
 
 cdef extern from "gmpxx.h":
     cdef cppclass mpz_class:
@@ -28,18 +132,10 @@ cdef extern from "gmpxx.h":
         mpz_t get_mpz_t()
         mpz_class operator%(mpz_class, mpz_class)
 
-ctypedef mp_limb_t ulong
-ctypedef mp_limb_signed_t slong
 
-cdef extern from "flint/fmpz.h":
-    ctypedef slong fmpz
-    ctypedef fmpz fmpz_t[1]
-    void fmpz_get_mpz(mpz_t x, const fmpz_t f) noexcept
-    void fmpz_init(fmpz_t f)
-    void fmpz_set_ui(fmpz_t f, ulong g)
-    void fmpz_set_si(fmpz_t f, slong g)
-    void fmpz_clear(fmpz_t f)
-    int fmpz_print(const fmpz_t x)
+
+
+
 
 cdef extern from "flint/fmpq.h":
     ctypedef struct fmpq:

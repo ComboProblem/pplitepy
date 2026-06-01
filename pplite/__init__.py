@@ -10,7 +10,7 @@ AUTHORS:
 - Acadia Larsen (2024): initial version.
 """
 
-__version__ = "0.0.55"
+__version__ = "0.0.57"
 
 from .linear_algebra import (
         Variable, Linear_Expression, Affine_Expression

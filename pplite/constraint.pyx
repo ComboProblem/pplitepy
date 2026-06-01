@@ -2,13 +2,12 @@
 # distutils: libraries = gmp gmpxx pplite m flint
 
 
-from gmpy2 cimport GMPy_MPZ_From_mpz, import_gmpy2, mpz, mpz_t, GMPy_MPZ_From_mpz, MPZ_Check
+from gmpy2 cimport GMPy_MPZ_From_mpz, import_gmpy2, mpz, mpz_t, GMPy_MPZ_From_mpz, MPZ_Check, MPZ
 from cython.operator cimport dereference as deref
 from cpython.object cimport Py_LT, Py_LE, Py_EQ, Py_NE, Py_GT, Py_GE
 from .linear_algebra import Variable, Affine_Expression, Linear_Expression
-# from .integer_conversions cimport FLINT_Integer_to_Python, Python_int_to_FLINT_Integer
+from .integer_conversions cimport FLINT_Integer_to_Python, Python_int_to_FLINT_Integer
 # from .integer_conversions import FLINT_Integer_Conversion_Check
-# Using imported integer conversions breaks the code.
 
 
 import_gmpy2()
@@ -603,30 +602,7 @@ cdef _wrap_Constraint(Con constraint):
     wrapped_constraint.thisptr[0] = constraint
     return wrapped_constraint
 
-
-# Reproduction of these functions here is necessary. Removing this causes things to break.
-cdef FLINT_Integer_to_Python(FLINT_Integer& integer):
-    r""" Converts FLINT_Integer to python integer."""
-    cdef mpz_t new_int
-    mpz_init(new_int)
-    fmpz_get_mpz(new_int, integer.impl())
-    y = GMPy_MPZ_From_mpz(new_int)
-    mpz_clear(new_int)
-    return y
-
-
-cdef FLINT_Integer Python_int_to_FLINT_Integer(integer):
-    cdef fmpz_t x
-    cdef fmpz y
-    if isinstance(integer, (int, str)):
-        fmpz_init(x)
-        fmpz_set_si(x, integer)
-        return FLINT_Integer(x)
-    if MPZ_Check(integer): # is this okay?
-        y = <fmpz> integer
-        return FLINT_Integer(y)
-    raise ValueError("Integer Conversion Failed")
-
+# This might not be needed. 
 
 def FLINT_Integer_Conversion_Check(possible_integer):
     """
