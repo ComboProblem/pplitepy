@@ -393,6 +393,8 @@ cdef class NNC_Polyhedron(object):
 
         Note: the constraints space dim is not necessarily the ambient space dim of the poly.
         """
+        if not self.is_minimized():
+            self.minimize()
         cdef Cons constraint_vector
         constraint_vector = self.thisptr[0].copy_cons()
         result = []
@@ -407,6 +409,8 @@ cdef class NNC_Polyhedron(object):
         """
         Returns a list of :class:`PPliteGenerator`of the polyhedron.
         """
+        if not self.is_minimized():
+            self.minimize()
         cdef Gens generator_vector
         generator_vector = self.thisptr[0].copy_gens()
         result = []
