@@ -1452,7 +1452,7 @@ cdef class Affine_Expression(object):
 
     def __mul__(self, other):
         cdef Affine_Expr* a
-        if isinstance(self, Linear_Expression):
+        if isinstance(self, Affine_Expression):
             a = (<Affine_Expression> self).thisptr
             c = other
         else:
@@ -1460,13 +1460,15 @@ cdef class Affine_Expression(object):
             a = (<Affine_Expression> other).thisptr
             c = self
         cdef FLINT_Integer cc = Python_int_to_FLINT_Integer(c)
-        cdef Affine_Expression result = Linear_Expression()
-        result.thisptr[0] = a[0] * cc
-        return result
+        cdef Affine_Expr result
+        result = a[0] * cc
+        result_expr = Affine_Expression()
+        result_expr.thisptr[0] = result
+        return result_expr
 
     def __rmul__(self, other):
         cdef Affine_Expr* a
-        if isinstance(self, Linear_Expression):
+        if isinstance(self, Affine_Expression):
             a = (<Affine_Expression> self).thisptr
             c = other
         else:
@@ -1474,9 +1476,11 @@ cdef class Affine_Expression(object):
             a = (<Affine_Expression> other).thisptr
             c = self
         cdef FLINT_Integer cc = Python_int_to_FLINT_Integer(c)
-        cdef Affine_Expression result = Linear_Expression()
-        result.thisptr[0] = a[0] * cc
-        return result
+        cdef Affine_Expr result
+        result = a[0] * cc
+        result_expr = Affine_Expression()
+        result_expr.thisptr[0] = result
+        return result_expr
 
     def __neg__(self):
         neg_assign(self.thisptr[0])
